@@ -19,7 +19,7 @@ import java.time.Duration;
 /**
  * Created by sam on 20/03/16.
  */
-@Named
+@Named(value = "securityFilter")
 public class SecurityFilter implements Filter {
 
     private static final String TOKEN_HEADER_ID_NAME = "session.token.id";
@@ -94,7 +94,8 @@ public class SecurityFilter implements Filter {
     }
 
     public User getLoggedInUser(){
-        return userWithTokenIdThreadLocal.get().user;
+        UserAndToken userAndToken = userWithTokenIdThreadLocal.get();
+        return userAndToken == null ? null : userAndToken.user;
     }
 
 
@@ -109,22 +110,26 @@ public class SecurityFilter implements Filter {
         }
     }
 
-    public Token login(String username, String password, Duration sessionDuration, Duration refreshDuration){
-        User user = userStore.getUserByUsername(username);
+    private boolean verifyLogin(User user, String password){
         if(user == null){
             BCrypt.checkpw("USER_NOT_FOUND_INVALID_PASSWORD", invalidHash); //prevent timing attacks
-            return null;
+            return false;
         }
+        return BCrypt.checkpw(password, user.getPasswordHash());
+    }
 
-        if(BCrypt.checkpw(password, user.getPasswordHash())) {
+    public Token login(String username, String password, Duration sessionDuration, Duration refreshDuration){
+        User user = userStore.getUserByUsername(username);
+        if(verifyLogin(user, password)){
             Token token = tokenStore.generateToken(user.getId(), sessionDuration.toMillis(), refreshDuration.toMillis());
             UserAndToken currentUserAndToken = new UserAndToken();
             currentUserAndToken.token = token;
             currentUserAndToken.user = user;
             userWithTokenIdThreadLocal.set(currentUserAndToken);
             return token;
+        }else{
+            return null;
         }
-        return null;
     }
 
     public Token refresh(String refreshTokenId){
@@ -146,6 +151,10 @@ public class SecurityFilter implements Filter {
     private static class UserAndToken {
          User user;
          Token token;
+    }
+
+    public static String hashPassword(String password){
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }
 

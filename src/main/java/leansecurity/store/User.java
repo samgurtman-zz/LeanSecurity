@@ -1,9 +1,6 @@
 package leansecurity.store;
 
 
-import leansecurity.filters.Permission;
-
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -13,6 +10,5 @@ public interface User {
     String getId();
     String getUsername();
     String getPasswordHash();
-    Set<? extends Permission> getPermissions();
     Set<String> getRoles();
 }

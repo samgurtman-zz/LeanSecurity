@@ -1,9 +1,7 @@
 package leansecurity.store;
 
-import leansecurity.filters.Permission;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +21,6 @@ public class InMemoryUserStore implements UserStore{
         user.setPasswordHash(BCrypt.hashpw("password",BCrypt.gensalt()));
         user.setUsername("test");
         user.setRoles(Collections.singleton("testrole"));
-        user.setPermissions(Collections.singleton(new Permission("abc","123","write")));
         userByIdMap.put(user.getId(), user);
         userByNameMap.put(user.getUsername(), user);
     }
@@ -44,7 +41,6 @@ public class InMemoryUserStore implements UserStore{
         private String id;
         private String username;
         private String passwordHash;
-        private Set<Permission> permissions;
         private Set<String> roles;
 
         @Override
@@ -60,11 +56,6 @@ public class InMemoryUserStore implements UserStore{
         @Override
         public String getPasswordHash() {
             return passwordHash;
-        }
-
-        @Override
-        public Set<? extends Permission> getPermissions() {
-            return permissions;
         }
 
         @Override
@@ -84,9 +75,6 @@ public class InMemoryUserStore implements UserStore{
             this.passwordHash = passwordHash;
         }
 
-        public void setPermissions(Set<Permission> permissions) {
-            this.permissions = permissions;
-        }
 
         public void setRoles(Set<String> roles) {
             this.roles = roles;
