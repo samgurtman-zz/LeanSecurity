@@ -1,4 +1,7 @@
-package leansecurity.store;
+package store;
+
+import leansecurity.store.Token;
+import leansecurity.store.TokenStore;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -6,24 +9,24 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by sam on 18/04/16.
  */
-public class InMemoryTokenStore implements TokenStore {
+public class InMemoryTokenStore implements TokenStore<InMemoryTokenStore.InMemoryToken> {
 
     ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByIdMap = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByRefreshIdMap = new ConcurrentHashMap<>();
 
 
     @Override
-    public Token getToken(String tokenId) {
+    public InMemoryToken getToken(String tokenId) {
         return tokenByIdMap.get(tokenId);
     }
 
     @Override
-    public Token getTokenByRefresh(String refreshId) {
+    public InMemoryToken getTokenByRefresh(String refreshId) {
         return tokenByRefreshIdMap.get(refreshId);
     }
 
     @Override
-    public Token generateToken(String userId, long durationMillis, long refreshDurationMillis) {
+    public InMemoryToken generateToken(String userId, long durationMillis, long refreshDurationMillis) {
         InMemoryToken token = new InMemoryToken(userId, durationMillis, refreshDurationMillis);
         tokenByIdMap.put(token.getTokenId(), token);
         tokenByRefreshIdMap.put(token.getRefreshTokenId(), token);
@@ -35,7 +38,7 @@ public class InMemoryTokenStore implements TokenStore {
 
     }
 
-    private static class InMemoryToken implements Token{
+    public static class InMemoryToken implements Token{
 
         private String tokenId;
         private String refreshTokenId;

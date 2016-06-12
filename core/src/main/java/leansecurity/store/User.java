@@ -10,5 +10,4 @@ public interface User {
     String getId();
     String getUsername();
     String getPasswordHash();
-    Set<String> getRoles();
 }

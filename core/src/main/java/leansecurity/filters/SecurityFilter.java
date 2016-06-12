@@ -10,6 +10,7 @@ import leansecurity.store.UserStore;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,9 +18,9 @@ import java.io.IOException;
 import java.time.Duration;
 
 /**
- * Created by sam on 20/03/16.
+ * Main security framework filter
  */
-@Named(value = "securityFilter")
+@Named("securityFilter")
 public class SecurityFilter implements Filter {
 
     private static final String TOKEN_HEADER_ID_NAME = "session.token.id";
@@ -78,6 +79,11 @@ public class SecurityFilter implements Filter {
         }
     }
 
+    /**
+     * Handles exceptions thrown by the security framework
+     * @param message message to append to error response
+     * @param errorCode error code to return
+     */
     private void handleError(String message, int errorCode){
         HttpServletResponse response = responseThreadLocal.get();
         if(!response.isCommitted()){
@@ -93,12 +99,19 @@ public class SecurityFilter implements Filter {
     public void destroy() {
     }
 
+    /**
+     * Get the currently logged in user
+     * @return currently logged in user or null if no user is logged in
+     */
     public User getLoggedInUser(){
         UserAndToken userAndToken = userWithTokenIdThreadLocal.get();
         return userAndToken == null ? null : userAndToken.user;
     }
 
-
+    /**
+     * Log out the current user
+     * @return whether user was logged out (true if user was found to log out)
+     */
     public boolean logout(){
         UserAndToken userAndToken = userWithTokenIdThreadLocal.get();
         if(userAndToken == null){
@@ -106,6 +119,7 @@ public class SecurityFilter implements Filter {
         }
         else{
             tokenStore.removeToken(userAndToken.token.getTokenId());
+            userWithTokenIdThreadLocal.remove();
             return true;
         }
     }
@@ -118,6 +132,14 @@ public class SecurityFilter implements Filter {
         return BCrypt.checkpw(password, user.getPasswordHash());
     }
 
+    /**
+     * Login a new current user
+     * @param username username to log in
+     * @param password password of user to use
+     * @param sessionDuration duration of user's session
+     * @param refreshDuration duration of user's remember-me refresh duration
+     * @return
+     */
     public Token login(String username, String password, Duration sessionDuration, Duration refreshDuration){
         User user = userStore.getUserByUsername(username);
         if(verifyLogin(user, password)){
@@ -132,6 +154,11 @@ public class SecurityFilter implements Filter {
         }
     }
 
+    /**
+     * Refresh a user's session given their refresh token id
+     * @param refreshTokenId id of token
+     * @return new session token
+     */
     public Token refresh(String refreshTokenId){
         Token token = tokenStore.getTokenByRefresh(refreshTokenId);
         if(token == null){
@@ -145,14 +172,20 @@ public class SecurityFilter implements Filter {
             }
         }
     }
+
     /**
-     * Created by sam on 25/03/16.
+     * Wrapper to hold User and their token in the current thread
      */
     private static class UserAndToken {
          User user;
          Token token;
     }
 
+    /**
+     * Hash password in correct framework hashing algorithm
+     * @param password password to hash
+     * @return hashed password
+     */
     public static String hashPassword(String password){
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
