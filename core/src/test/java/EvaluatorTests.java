@@ -19,7 +19,7 @@ import java.util.UUID;
 import static org.junit.Assert.fail;
 
 /**
- * Created by sam on 12/06/16.
+ * tests for security evaluator
  */
 public class EvaluatorTests {
     private InMemoryUserStore userStore = new InMemoryUserStore();
