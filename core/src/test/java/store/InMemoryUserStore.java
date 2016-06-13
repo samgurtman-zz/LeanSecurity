@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Created by sam on 25/03/16.
@@ -42,7 +43,7 @@ public class InMemoryUserStore implements UserStore<InMemoryUserStore.InMemoryUs
         private String username;
         private String passwordHash;
         private Set<String> roles;
-        private Map<ResourceIdentifier, List<String>> permissions;
+        private Map<ResourceIdentifier, List<String>> permissions = new HashMap<>();
 
         @Override
         public String getId() {
@@ -85,6 +86,14 @@ public class InMemoryUserStore implements UserStore<InMemoryUserStore.InMemoryUs
         }
 
 
+        public void addPermission(String type, String id, String permission){
+            ResourceIdentifier identifier = new ResourceIdentifier(type, id);
+            permissions.compute(identifier, (key, oldValue) ->{
+                List<String> newValues = oldValue == null ? new ArrayList<String>() : new ArrayList<String>(oldValue);
+                newValues.add(permission);
+                return newValues;
+            });
+        }
 
         public static class ResourceIdentifier implements Resource{
 

@@ -12,6 +12,6 @@ public class InMemoryPermissionStore implements PermissionStore <InMemoryUserSto
     @Override
     public boolean hasPermssion(String resourceType, String resourceId, InMemoryUserStore.InMemoryUser inMemoryUser, String permission) {
         List<String> permissions = inMemoryUser.getPermissions(resourceType, resourceId);
-        return permission.contains(permission);
+        return permissions != null && permissions.contains(permission);
     }
 }
