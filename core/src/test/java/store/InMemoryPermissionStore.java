@@ -6,12 +6,12 @@ import leansecurity.store.User;
 import java.util.List;
 
 /**
- * Created by sam on 12/06/16.
+ * PermissionStore for tests
  */
-public class InMemoryPermissionStore implements PermissionStore <InMemoryUserStore.InMemoryUser>{
+public class InMemoryPermissionStore implements PermissionStore{
     @Override
-    public boolean hasPermssion(String resourceType, String resourceId, InMemoryUserStore.InMemoryUser inMemoryUser, String permission) {
-        List<String> permissions = inMemoryUser.getPermissions(resourceType, resourceId);
+    public boolean hasPermssion(String resourceType, String resourceId, User inMemoryUser, String permission) {
+        List<String> permissions = ((InMemoryUserStore.InMemoryUser)inMemoryUser).getPermissions(resourceType, resourceId);
         return permissions != null && permissions.contains(permission);
     }
 }

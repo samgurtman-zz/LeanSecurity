@@ -1,16 +1,16 @@
 package leansecurity.store;
 
 /**
- * Created by sam on 20/03/16.
+ * Manages tokens for security filter
  */
-public interface TokenStore <T extends Token> {
+public interface TokenStore {
 
-    T getToken(String tokenId);
+    Token getToken(String tokenId);
 
-    T getTokenByRefresh(String refreshId);
+    Token getTokenByRefresh(String refreshId);
 
-    T generateToken(String userId, long durationMillis, long refreshDurationMillis);
+    Token generateToken(User user, long durationMillis, long refreshDurationMillis);
 
-    void removeToken(String tokenId);
+    void removeToken(Token token);
 
 }

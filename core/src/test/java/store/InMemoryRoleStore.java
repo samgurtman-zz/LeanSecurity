@@ -1,13 +1,14 @@
 package store;
 
 import leansecurity.store.RoleStore;
+import leansecurity.store.User;
 
 /**
- * Created by sam on 12/06/16.
+ * Role Store for tests
  */
-public class InMemoryRoleStore implements RoleStore<InMemoryUserStore.InMemoryUser> {
+public class InMemoryRoleStore implements RoleStore {
     @Override
-    public boolean hasRole(InMemoryUserStore.InMemoryUser user, String role) {
-        return user.getRoles().contains(role);
+    public boolean hasRole(User user, String role) {
+        return ((InMemoryUserStore.InMemoryUser)user).getRoles().contains(role);
     }
 }

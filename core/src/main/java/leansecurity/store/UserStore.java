@@ -1,9 +1,9 @@
 package leansecurity.store;
 
 /**
- * Created by sam on 13/04/16.
+ * Manages users for security filter
  */
-public interface UserStore <T extends User>{
-    T getUserByUsername(String username);
-    T getUserById(String id);
+public interface UserStore{
+    User getUserByUsername(String username);
+    User getUserById(String id);
 }

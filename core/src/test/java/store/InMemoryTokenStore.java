@@ -2,17 +2,18 @@ package store;
 
 import leansecurity.store.Token;
 import leansecurity.store.TokenStore;
+import leansecurity.store.User;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by sam on 18/04/16.
+ * TokenStore for tests
  */
-public class InMemoryTokenStore implements TokenStore<InMemoryTokenStore.InMemoryToken> {
+public class InMemoryTokenStore implements TokenStore {
 
-    ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByIdMap = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByRefreshIdMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByIdMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, InMemoryTokenStore.InMemoryToken> tokenByRefreshIdMap = new ConcurrentHashMap<>();
 
 
     @Override
@@ -26,19 +27,19 @@ public class InMemoryTokenStore implements TokenStore<InMemoryTokenStore.InMemor
     }
 
     @Override
-    public InMemoryToken generateToken(String userId, long durationMillis, long refreshDurationMillis) {
-        InMemoryToken token = new InMemoryToken(userId, durationMillis, refreshDurationMillis);
+    public InMemoryToken generateToken(User user, long durationMillis, long refreshDurationMillis) {
+        InMemoryToken token = new InMemoryToken(user.getId(), durationMillis, refreshDurationMillis);
         tokenByIdMap.put(token.getTokenId(), token);
         tokenByRefreshIdMap.put(token.getRefreshTokenId(), token);
         return token;
     }
 
     @Override
-    public void removeToken(String tokenId) {
+    public void removeToken(Token tokenId) {
 
     }
 
-    public static class InMemoryToken implements Token{
+    private static class InMemoryToken implements Token{
 
         private String tokenId;
         private String refreshTokenId;

@@ -10,23 +10,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
- * Created by sam on 25/03/16.
+ * UserStore for tests
  */
-public class InMemoryUserStore implements UserStore<InMemoryUserStore.InMemoryUser> {
-    ConcurrentHashMap<String, InMemoryUser> userByIdMap = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, InMemoryUser> userByNameMap = new ConcurrentHashMap<>();
+public class InMemoryUserStore implements UserStore {
+    private ConcurrentHashMap<String, InMemoryUser> userByIdMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, InMemoryUser> userByNameMap = new ConcurrentHashMap<>();
 
 
     public InMemoryUserStore(){
     }
 
     @Override
-    public InMemoryUser getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userByNameMap.get(username);
     }
 
     @Override
-    public InMemoryUser getUserById(String id) {
+    public User getUserById(String id) {
         return userByIdMap.get(id);
     }
 
@@ -60,11 +60,11 @@ public class InMemoryUserStore implements UserStore<InMemoryUserStore.InMemoryUs
             return passwordHash;
         }
 
-        public Set<String> getRoles() {
+        Set<String> getRoles() {
             return roles;
         }
 
-        public List<String> getPermissions(String resourceType, String resourceId){
+        List<String> getPermissions(String resourceType, String resourceId){
             return permissions.get(new ResourceIdentifier(resourceType, resourceId));
         }
 
@@ -89,13 +89,13 @@ public class InMemoryUserStore implements UserStore<InMemoryUserStore.InMemoryUs
         public void addPermission(String type, String id, String permission){
             ResourceIdentifier identifier = new ResourceIdentifier(type, id);
             permissions.compute(identifier, (key, oldValue) ->{
-                List<String> newValues = oldValue == null ? new ArrayList<String>() : new ArrayList<String>(oldValue);
+                List<String> newValues = oldValue == null ? new ArrayList<>() : new ArrayList<>(oldValue);
                 newValues.add(permission);
                 return newValues;
             });
         }
 
-        public static class ResourceIdentifier implements Resource{
+        static class ResourceIdentifier implements Resource{
 
             private String type;
             private String id;

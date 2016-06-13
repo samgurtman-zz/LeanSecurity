@@ -20,7 +20,6 @@ import java.time.Duration;
 /**
  * Main security framework filter
  */
-@Named("securityFilter")
 public class SecurityFilter implements Filter {
 
     private static final String TOKEN_HEADER_ID_NAME = "session.token.id";
@@ -32,7 +31,6 @@ public class SecurityFilter implements Filter {
     private ThreadLocal<HttpServletResponse> responseThreadLocal = new ThreadLocal<>();
     private ThreadLocal<UserAndToken> userWithTokenIdThreadLocal = new ThreadLocal<>();
 
-    @Inject
     public SecurityFilter(TokenStore tokenStore, UserStore userStore){
         this.tokenStore = tokenStore;
         this.userStore = userStore;
@@ -118,7 +116,7 @@ public class SecurityFilter implements Filter {
             return false;
         }
         else{
-            tokenStore.removeToken(userAndToken.token.getTokenId());
+            tokenStore.removeToken(userAndToken.token);
             userWithTokenIdThreadLocal.remove();
             return true;
         }
@@ -138,12 +136,12 @@ public class SecurityFilter implements Filter {
      * @param password password of user to use
      * @param sessionDuration duration of user's session
      * @param refreshDuration duration of user's remember-me refresh duration
-     * @return
+     * @return session token that must be passed as header on all future requests
      */
     public Token login(String username, String password, Duration sessionDuration, Duration refreshDuration){
         User user = userStore.getUserByUsername(username);
         if(verifyLogin(user, password)){
-            Token token = tokenStore.generateToken(user.getId(), sessionDuration.toMillis(), refreshDuration.toMillis());
+            Token token = tokenStore.generateToken(user, sessionDuration.toMillis(), refreshDuration.toMillis());
             UserAndToken currentUserAndToken = new UserAndToken();
             currentUserAndToken.token = token;
             currentUserAndToken.user = user;
@@ -165,8 +163,9 @@ public class SecurityFilter implements Filter {
             return null;
         }else{
             if(System.currentTimeMillis() < token.getIssuedEpochMillis() + token.getRefreshTokenDurationMillis()){
-                tokenStore.removeToken(token.getTokenId());
-                return tokenStore.generateToken(token.getUserId(), token.getTokenDurationMillis(), token.getRefreshTokenDurationMillis());
+                tokenStore.removeToken(token);
+                User user = userStore.getUserById(token.getUserId());
+                return tokenStore.generateToken(user, token.getTokenDurationMillis(), token.getRefreshTokenDurationMillis());
             }else{
                 return null;
             }
@@ -176,7 +175,7 @@ public class SecurityFilter implements Filter {
     /**
      * Wrapper to hold User and their token in the current thread
      */
-    private static class UserAndToken {
+    private class UserAndToken {
          User user;
          Token token;
     }

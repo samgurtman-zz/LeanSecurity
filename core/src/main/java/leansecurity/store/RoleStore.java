@@ -1,14 +1,15 @@
 package leansecurity.store;
 
 /**
- * Created by sam on 12/06/16.
+ * Tests role  for security filter
  */
-public interface RoleStore <T extends User> {
+public interface RoleStore {
 
     /**
      * Get the permission
-     * @param user
-     * @return
+     * @param user user to test if has role
+     * @param role role to test
+     * @return whether use has role
      */
-    boolean hasRole(T user, String role);
+    boolean hasRole(User user, String role);
 }

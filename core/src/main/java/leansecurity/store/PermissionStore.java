@@ -3,16 +3,15 @@ package leansecurity.store;
 import java.util.Collection;
 
 /**
- * Created by sam on 13/05/16.
+ * Manages permissions for security filter
  */
-public interface PermissionStore <T extends User> {
-
+public interface PermissionStore {
     /**
      * Get the permission
-     * @param resourceType
-     * @param resourceId
-     * @param user
-     * @return
+     * @param resourceType resource type
+     * @param resourceId resource id
+     * @param user user to check permission for
+     * @return whether user has permission on resource
      */
-    boolean hasPermssion(String resourceType, String resourceId, T user, String permission);
+    boolean hasPermssion(String resourceType, String resourceId, User user, String permission);
 }
