@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 /**
  * Created by sam on 12/06/16.
  */
-public class evaluatorTest {
+public class EvaluatorTests {
     private InMemoryUserStore userStore = new InMemoryUserStore();
     private InMemoryTokenStore tokenStore = new InMemoryTokenStore();
     private SecurityFilter filter;
